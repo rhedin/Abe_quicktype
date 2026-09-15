@@ -17,3 +17,6 @@ I asked for those conversations.  But it took a lot of time.
 
 After a couple of days (!) I found a pdf from Michael Droettboom et al. that 
 covers Classic well.  In not too many pages, too. 
+
+This is where my copy of Understanding JSON Schema, aimed at Draft 7, came from. 
+https://tinman.cs.gsu.edu/~raj/8711/sp21/json/UnderstandingJSONSchema.pdf
