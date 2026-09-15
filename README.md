@@ -3,6 +3,18 @@
 [![npm version](https://badge.fury.io/js/quicktype.svg)](https://badge.fury.io/js/quicktype)
 [![Build status](https://github.com/glideapps/quicktype/actions/workflows/test-pr.yaml/badge.svg?branch=master)](https://github.com/glideapps/quicktype/actions/workflows/test-pr.yaml)
 
+---
+
+I cloned https://github.com/glideapps/quicktype because I was afraid they would "move on up" to Modern JSON Schema. 
+
+I'm using Classic JSON Schema for Abe the Abstracting Editor.  And I chose Classic because that's what QuickType uses.  I don't want QuickType to move to Modern, and strand me. 
+
+These days, AI's expect Modern.  And so there's a strong industry push to finally abandon Classic (2019) and move to Modern (2026).  Before too long, QuickType will follow suit. 
+
+I don't need the features (and mis-features) of Modern. 
+
+---
+
 `quicktype` generates strongly-typed models and serializers from JSON, JSON Schema, TypeScript, and [GraphQL queries](https://blog.quicktype.io/graphql-with-quicktype/), making it a breeze to work with JSON type-safely in many programming languages.
 
 -   [Try `quicktype` in your browser](https://app.quicktype.io).
