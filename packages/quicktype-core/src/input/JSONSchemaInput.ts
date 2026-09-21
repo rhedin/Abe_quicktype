@@ -153,11 +153,15 @@ function normalizeURI(uri: string | URI): URI {
 }
 
 export class Ref {
+    // public static root(address: string | undefined): Ref {
+    //     const uri = definedMap(address, (a) => new URI(fixWindowsPath(a)));
+    //     return new Ref(uri, []);
+    // }  Changed by Rick and Claude.  Because root and ParseURI had two 
+    // different ways of representing the root of the schema. 
     public static root(address: string | undefined): Ref {
         const uri = definedMap(address, (a) => new URI(fixWindowsPath(a)));
-        return new Ref(uri, []);
+        return new Ref(uri, [{ kind: PathElementKind.Root }]);
     }
-
     private static parsePath(path: string): readonly PathElement[] {
         const elements: PathElement[] = [];
 
