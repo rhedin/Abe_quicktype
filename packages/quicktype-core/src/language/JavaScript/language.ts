@@ -44,6 +44,16 @@ export const javaScriptOptions = {
         "json",
         "secondary",
     ),
+    // NEW: mirrors the `module-system` option already used by the
+    // javascript-prop-types target (see JavaScriptPropTypesRenderer.ts).
+    // Default is "common-js" so existing output is byte-identical unless
+    // a caller explicitly opts in to "es6".
+    moduleSystem: new EnumOption(
+        "module-system",
+        "Which module system to use",
+        { "common-js": false, es6: true } as const,
+        "common-js",
+    ),
 };
 
 export const javaScriptLanguageConfig = {

@@ -586,11 +586,25 @@ function r(name${stringAnnotation}) {
     }
 
     protected emitUsageImportComment(givenOutputFilename: string): void {
-        this.emitLine(
-            '//   const Convert = require("./',
-            this.usageModuleName(givenOutputFilename),
-            '");',
-        );
+        // NEW: es6 branch. Using a namespace import ("import * as Convert")
+        // keeps the sample usage lines below (`Convert.to<Name>(json)`)
+        // valid without touching emitUsageComments() at all -- the module
+        // no longer has a single "Convert" export, but the namespace
+        // object built by `import * as` still exposes every named export
+        // under that name.
+        if (this._jsOptions.moduleSystem) {
+            this.emitLine(
+                '//   import * as Convert from "./',
+                this.usageModuleName(givenOutputFilename),
+                '";',
+            );
+        } else {
+            this.emitLine(
+                '//   const Convert = require("./',
+                this.usageModuleName(givenOutputFilename),
+                '");',
+            );
+        }
     }
 
     protected emitUsageComments(givenOutputFilename: string): void {
@@ -623,24 +637,53 @@ function r(name${stringAnnotation}) {
     protected emitModuleExports(): void {
         this.ensureBlankLine();
 
-        this.emitBlock("module.exports = ", ";", () => {
-            const exporter = (_: Type, name: Name): void => {
-                const serializer = this.serializerFunctionName(name);
-                const deserializer = this.deserializerFunctionName(name);
-                this.emitLine('"', serializer, '": ', serializer, ",");
-                this.emitLine('"', deserializer, '": ', deserializer, ",");
-            };
+        // NEW: es6 branch, kept structurally parallel to the common-js
+        // branch below (same exporter/forEach shape) rather than merged
+        // with it, so the two are easy to diff against each other and
+        // against the pre-change version of this method. Because the
+        // quoted key emitted in the common-js object literal is always
+        // identical to the identifier it points to (e.g. `"userToJson":
+        // userToJson`), the es6 named-export list needs no aliasing --
+        // `export { userToJson, ... };` is the direct equivalent.
+        if (this._jsOptions.moduleSystem) {
+            this.emitBlock("export ", ";", () => {
+                const exporter = (_: Type, name: Name): void => {
+                    const serializer = this.serializerFunctionName(name);
+                    const deserializer = this.deserializerFunctionName(name);
+                    this.emitLine(serializer, ",");
+                    this.emitLine(deserializer, ",");
+                };
 
-            switch (this._jsOptions.converters) {
-                case ConvertersOptions.AllObjects:
-                    this.forEachObject("none", exporter);
-                    break;
+                switch (this._jsOptions.converters) {
+                    case ConvertersOptions.AllObjects:
+                        this.forEachObject("none", exporter);
+                        break;
 
-                default:
-                    this.forEachTopLevel("none", exporter);
-                    break;
-            }
-        });
+                    default:
+                        this.forEachTopLevel("none", exporter);
+                        break;
+                }
+            });
+        } else {
+            this.emitBlock("module.exports = ", ";", () => {
+                const exporter = (_: Type, name: Name): void => {
+                    const serializer = this.serializerFunctionName(name);
+                    const deserializer = this.deserializerFunctionName(name);
+                    this.emitLine('"', serializer, '": ', serializer, ",");
+                    this.emitLine('"', deserializer, '": ', deserializer, ",");
+                };
+
+                switch (this._jsOptions.converters) {
+                    case ConvertersOptions.AllObjects:
+                        this.forEachObject("none", exporter);
+                        break;
+
+                    default:
+                        this.forEachTopLevel("none", exporter);
+                        break;
+                }
+            });
+        }
     }
 
     protected emitSourceStructure(givenOutputFilename: string): void {

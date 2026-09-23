@@ -6,11 +6,42 @@
 # Use script/quickesttype to skip reinstalling dependencies
 # and rebuilding PureScript for 10s faster runs if you
 # are just working on TargetLanguage code in TypeScript.
+# 
+# Rick added the npm link so the local build can be run 
+# from anywhere.  Among other things, it sets the file 
+# to be executable. 
 
 SCRIPTDIR=$(dirname "$0")
 BASEDIR="$SCRIPTDIR/.."
 
 if [ x"$SKIP_BUILD" = x ] ; then
-    ( cd "$BASEDIR" ; npm run build &>/dev/null )
+    ( 
+        cd "$BASEDIR" ; 
+        npm run build &>/tmp/quicktype_build_output.txt 
+        if [ $? -ne 0 ]; then 
+            echo "
+            
+
+            The build failed.  The build log is in /tmp/quicktype_build_output.txt.
+            
+            " 
+            exit 1 
+        fi 
+        npm link &>/tmp/npm_link_output.txt 
+        if [ $? -ne 0 ]; then 
+            echo "
+            
+            
+            Npm link failed.  The run log is in /tmp/npm_link_output.txt.
+            
+            " 
+            exit 1 
+        fi 
+        # If the link already exists, npm link doesn't set the permissions. 
+        chmod a+x dist/index.js
+        if [ $? -ne 0 ]; then 
+            exit 1 
+        fi 
+    ) || exit 1  # We don't want the program to run if any part of the build didn't work. 
 fi
 node --stack_trace_limit=100 --max-old-space-size=4096 "$BASEDIR/dist/index.js" "$@"
